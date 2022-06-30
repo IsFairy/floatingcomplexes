@@ -1,5 +1,5 @@
 use super::ComplexValue::*;
-
+use num_irrational::{FromSqrt, QuadraticSurd};
 
 pub struct Entry {
     pub value: ComplexValue,
@@ -8,7 +8,7 @@ pub struct Entry {
 }
 
 pub struct ComplexTable {
-   pub Zero: Box<Entry>,
+    pub Zero: Box<Entry>,
     pub One: Box<Entry>,
     pub sqrt2_2: Box<Entry>,
 }
@@ -16,17 +16,20 @@ pub struct ComplexTable {
 impl ComplexTable {
     pub fn new() -> ComplexTable {
         let zero = Box::new(Entry {
-            value: Zero,
+            value: ComplexValue::from(0i64),
             next: None,
             ref_count: 0,
         });
         let one = Box::new(Entry {
-            value: One,
+            value: ComplexValue::from(1i64),
             next: None,
             ref_count: 0,
         });
         let sqrt2_2 = Box::new(Entry {
-            value: Sqrt2_2,
+            value: ComplexValue::new(
+                QuadraticSurd::from_sqrt(2i64).unwrap(),
+                QuadraticSurd::from(0i64),
+            ),
             next: None,
             ref_count: 0,
         });
@@ -37,11 +40,4 @@ impl ComplexTable {
         }
     }
 
-    pub fn get(&mut self, value: ComplexValue) -> Box<Entry> {
-        match value {
-            ComplexValue::Zero => self.Zero,
-            ComplexValue::One => self.One,
-            ComplexValue::Sqrt2_2 => self.sqrt2_2,
-        }
-    }
 }

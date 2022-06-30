@@ -5,8 +5,13 @@ extern crate serde;
 
 use std::ops::{Add, AddAssign, Mul, MulAssign};
 
-use num::ToPrimitive;
+use num::{ToPrimitive, Zero, One};
 use num_irrational::{QuadraticSurd, FromSqrt};
+
+
+pub trait Sqrt2_2 {
+    fn sqrt2_2() -> Self;
+}
 
 #[derive(Debug, Clone, Copy, Hash, Eq)]
 pub struct ComplexValue {
@@ -14,43 +19,31 @@ pub struct ComplexValue {
     i: QuadraticSurd<i64>,
 }
 
-pub static Zero: ComplexValue = ComplexValue {
-    r: QuadraticSurd::from(0),
-    i: QuadraticSurd::from(0),
-};
-pub static One: ComplexValue = ComplexValue {
-    r: QuadraticSurd::from(1),
-    i: QuadraticSurd::from(0),
-};
-pub static Sqrt2_2: ComplexValue = ComplexValue {
-    r: QuadraticSurd::from_sqrt(2i64).unwrap(),
-    i: QuadraticSurd::from(0),
-};
 
 impl ComplexValue {
-    fn new(r: QuadraticSurd<i64>, i: QuadraticSurd<i64>) -> ComplexValue {
+    pub fn new(r: QuadraticSurd<i64>, i: QuadraticSurd<i64>) -> ComplexValue {
         ComplexValue { r: r, i: i }
     }
 
-    fn approximately_equals(self, other: ComplexValue) -> bool {
+    pub fn approximately_equals(self, other: ComplexValue) -> bool {
         self.r == other.r && self.i == other.i
     }
 
-    fn approximately_zero(self) -> bool {
+    pub fn approximately_zero(self) -> bool {
         self.r == QuadraticSurd::from(0i64) && self.i == QuadraticSurd::from(0i64)
     }
-    fn approximately_one(self) -> bool {
+    pub fn approximately_one(self) -> bool {
         self.r == QuadraticSurd::from(1i64) && self.i == QuadraticSurd::from(0i64)
     }
 
-    fn get_lowest_fraction(self) -> (i64, i64) {
+    pub fn get_lowest_fraction(self) -> (i64, i64) {
         (
             self.r.to_rational().value().numer().clone(),
             self.r.to_rational().value().denom().to_owned().clone(),
         )
     }
 
-    fn print_formatted(self) {
+    pub fn print_formatted(self) {
         println!("{} + {}i", self.r, self.i);
     }
 }
@@ -108,6 +101,32 @@ impl num_traits::MulAdd for ComplexValue {
     }
 }
 
+impl Zero for ComplexValue {
+    fn zero() -> Self {
+        ComplexValue::new(QuadraticSurd::from(0i64), QuadraticSurd::from(0i64))
+    }
+
+    fn is_zero(&self) -> bool {
+        self.approximately_zero()
+    }
+}
+
+impl One for ComplexValue {
+    fn one() -> Self {
+        ComplexValue::new(QuadraticSurd::from(1i64), QuadraticSurd::from(0i64))
+    }
+
+    fn is_one(&self) -> bool {
+        self.approximately_one()
+    }
+}
+
+impl Sqrt2_2 for ComplexValue {
+    fn sqrt2_2() -> Self {
+        ComplexValue::new(QuadraticSurd::from_sqrt(2i64).unwrap(), QuadraticSurd::from(0i64))
+    }
+}
+
 impl Add for ComplexValue {
     type Output = ComplexValue;
 
@@ -138,21 +157,6 @@ impl MulAssign for ComplexValue {
     }
 }
 
-impl num_traits::Zero for ComplexValue {
-    fn zero() -> Self {
-        ComplexValue::new(QuadraticSurd::from(0i64), QuadraticSurd::from(0i64))
-    }
-
-    fn is_zero(&self) -> bool {
-        self.r == QuadraticSurd::from(0i64) && self.i == QuadraticSurd::from(0i64)
-    }
-}
-
-impl num_traits::One for ComplexValue {
-    fn one() -> Self {
-        ComplexValue::new(QuadraticSurd::from(1i64), QuadraticSurd::from(0i64))
-    }
-}
 
 impl ToString for ComplexValue {
     fn to_string(&self) -> String {
